@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Smart Contract-Based Escrow Payment System for Transportation Apps — Blockchain-powered secure payments">
+  <title>EscrowChain — Smart Contract Payment System</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔗</text></svg>">
+</head>
+<body>
+  <div id="app" class="app-container">
+
+    <!-- ====== LOGIN SCREEN ====== -->
+    <div id="login-screen" class="login-screen">
+      <div class="login-wrapper">
+        <div class="login-card">
+          <div class="login-logo">
+            <div class="logo-icon">🔗</div>
+            <h1>EscrowChain</h1>
+            <p>Smart Contract Payment System</p>
+          </div>
+
+          <div class="demo-credentials">
+            <h4>🔑 Demo Credentials</h4>
+            <div class="cred-row"><span>Customer</span><span class="cred-role">customer1</span></div>
+            <div class="cred-row"><span>Supplier</span><span class="cred-role">supplier1</span></div>
+            <div class="cred-row"><span>Driver</span><span class="cred-role">driver1</span></div>
+            <div class="cred-row"><span>Admin</span><span class="cred-role">admin1</span></div>
+            <div class="cred-row" style="margin-top:0.3rem; color:var(--text-muted)"><span>Password (all)</span><span class="cred-role">password123</span></div>
+          </div>
+
+          <form id="login-form">
+            <div class="form-group">
+              <label for="login-username">Username</label>
+              <input type="text" id="login-username" class="form-input" placeholder="Enter username" required autocomplete="username">
+            </div>
+            <div class="form-group">
+              <label for="login-password">Password</label>
+              <input type="password" id="login-password" class="form-input" placeholder="Enter password" required autocomplete="current-password">
+            </div>
+            <button type="submit" id="login-btn" class="btn btn-primary btn-block">
+              Sign In
+            </button>
+          </form>
+          <p id="login-error" class="mt-1" style="color:var(--accent-rose); font-size:0.82rem; text-align:center;"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== MAIN APP (HIDDEN UNTIL LOGIN) ====== -->
+    <div id="main-app" class="hidden">
+
+      <!-- HEADER -->
+      <header class="app-header">
+        <div class="header-inner">
+          <div class="header-brand">
+            <div class="brand-icon">🔗</div>
+            <div>
+              <h2>EscrowChain</h2>
+              <span>Blockchain Payment System</span>
+            </div>
+          </div>
+
+          <nav class="header-nav" id="main-nav">
+            <button class="nav-btn active" data-view="dashboard" id="nav-dashboard">📊 Dashboard</button>
+            <button class="nav-btn" data-view="orders" id="nav-orders">📦 Orders</button>
+            <button class="nav-btn" data-view="users" id="nav-users">👥 Users</button>
+            <button class="nav-btn" data-view="blockchain" id="nav-blockchain">⛓️ Blockchain</button>
+          </nav>
+
+          <div class="header-right">
+            <div class="user-badge">
+              <div class="avatar" id="user-avatar">A</div>
+              <div>
+                <div id="user-display-name" style="font-weight:600; font-size:0.82rem;">User</div>
+                <span class="role-tag" id="user-role-tag">role</span>
+              </div>
+            </div>
+            <button class="logout-btn" id="logout-btn">Logout</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="main-content">
+
+        <!-- DASHBOARD VIEW -->
+        <div id="view-dashboard" class="view-panel fade-in">
+          <div class="stats-grid" id="stats-container"></div>
+
+          <div class="section">
+            <div class="section-header">
+              <h2>📋 Recent Orders</h2>
+              <button class="btn btn-primary btn-sm" id="btn-new-order" onclick="showNewOrderModal()">+ New Order</button>
+            </div>
+            <div class="orders-grid" id="dashboard-orders"></div>
+          </div>
+        </div>
+
+        <!-- ORDERS VIEW -->
+        <div id="view-orders" class="view-panel hidden fade-in">
+          <div class="section">
+            <div class="section-header">
+              <h2>📦 All Orders</h2>
+              <button class="btn btn-primary btn-sm" id="btn-new-order-2" onclick="showNewOrderModal()">+ New Order</button>
+            </div>
+            <div class="orders-grid" id="orders-list"></div>
+          </div>
+        </div>
+
+        <!-- USERS VIEW (Admin) -->
+        <div id="view-users" class="view-panel hidden fade-in">
+          <div class="stats-grid" id="users-stats"></div>
+
+          <div class="section">
+            <div class="section-header">
+              <h2>👥 User Management</h2>
+              <button class="btn btn-primary btn-sm" id="btn-add-user" onclick="showAddUserModal()">+ Add User</button>
+            </div>
+            <div class="tab-bar" id="users-tab-bar">
+              <button class="tab-btn active" onclick="filterUsers('all', this)">All Users</button>
+              <button class="tab-btn" onclick="filterUsers('active', this)">Active Now</button>
+              <button class="tab-btn" onclick="filterUsers('admin', this)">Admins</button>
+              <button class="tab-btn" onclick="filterUsers('customer', this)">Customers</button>
+              <button class="tab-btn" onclick="filterUsers('driver', this)">Drivers</button>
+              <button class="tab-btn" onclick="filterUsers('supplier', this)">Suppliers</button>
+            </div>
+            <div class="users-table-wrap" id="users-table-container"></div>
+          </div>
+        </div>
+
+        <!-- BLOCKCHAIN VIEW -->
+        <div id="view-blockchain" class="view-panel hidden fade-in">
+          <div class="stats-grid" id="blockchain-stats"></div>
+
+          <div class="section">
+            <div class="section-header">
+              <h2>⛓️ Blockchain Ledger</h2>
+              <button class="btn btn-outline btn-sm" onclick="validateChain()">🔍 Validate Chain</button>
+            </div>
+            <div class="blockchain-chain" id="blockchain-chain"></div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- ====== TOAST CONTAINER ====== -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- ====== MODALS ====== -->
+    <div id="modal-container"></div>
+
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
