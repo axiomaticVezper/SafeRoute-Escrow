@@ -27,6 +27,14 @@ export default function Orders({ onOrderAction }) {
     function handleAction(action, orderId) {
         if (onOrderAction) onOrderAction(action, orderId, loadOrders);
     }
+    
+    // Prioritize active orders first, then sort by newest
+    const displayOrders = [...orders].sort((a, b) => {
+        const aActive = !['SETTLED', 'RESOLVED', 'DELETED'].includes(a.status);
+        const bActive = !['SETTLED', 'RESOLVED', 'DELETED'].includes(b.status);
+        if (aActive !== bActive) return aActive ? -1 : 1;
+        return new Date(b.createdAt) - new Date(a.createdAt);
+    });
 
     return (
         <div className="fade-in">
@@ -47,7 +55,7 @@ export default function Orders({ onOrderAction }) {
                     </div>
                 ) : (
                     <div className="orders-grid">
-                        {orders.map(order => (
+                        {displayOrders.map(order => (
                             <OrderCard key={order.orderId} order={order} onAction={handleAction} />
                         ))}
                     </div>

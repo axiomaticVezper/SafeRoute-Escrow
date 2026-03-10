@@ -63,8 +63,8 @@ stripe login
 ## 🗄 Data Persistence Notes
 
 - Neon/PostgreSQL tables are persistent across restarts (`users`, `orders_metadata`, `delivery_proofs`, `reputation_scores`).
-- The in-memory blockchain world state and local ledger reset on server restart.
-- Result: historical metadata remains in DB, but live in-memory order state requires rehydration logic if you want it to survive restarts.
+- The in-memory blockchain world state and local ledger initially reset on server restart.
+- **Improved**: The backend now includes a `rehydrateWorldState()` mechanism that fires on startup. It pulls historical and active orders from the persistent database and gracefully reconstructs the live `worldState` in RAM, allowing operations to survive server crashes or restarts seamlessly.
 
 ## ⭐ Reputation Scoring
 

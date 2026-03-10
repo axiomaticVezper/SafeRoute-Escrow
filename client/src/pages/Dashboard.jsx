@@ -25,37 +25,37 @@ export default function Dashboard({ onOrderAction }) {
     }
 
     const total = orders.length;
-    const active = orders.filter(o => !['SETTLED', 'RESOLVED'].includes(o.status)).length;
-    const settled = orders.filter(o => o.status === 'SETTLED').length;
+    const activeOrdersList = orders.filter(o => !['SETTLED', 'RESOLVED', 'DELETED'].includes(o.status));
+    const active = activeOrdersList.length;
+    const completed = orders.filter(o => ['SETTLED', 'RESOLVED'].includes(o.status)).length;
     const disputed = orders.filter(o => o.status === 'DISPUTED').length;
     const totalValue = orders.reduce((s, o) => s + (o.amount || 0), 0);
     const inTransit = orders.filter(o => o.status === 'IN_TRANSIT').length;
     const proofPending = orders.filter(o => o.status === 'PROOF_SUBMITTED').length;
-    const resolved = orders.filter(o => o.status === 'RESOLVED').length;
 
     const statsMap = {
         customer: [
             { icon: '📦', cls: 'indigo', value: total, label: 'Total Orders' },
             { icon: '⏳', cls: 'amber', value: active, label: 'Active' },
-            { icon: '✅', cls: 'emerald', value: settled, label: 'Settled' },
+            { icon: '✅', cls: 'emerald', value: completed, label: 'Completed' },
             { icon: '💰', cls: 'cyan', value: `₹${totalValue.toLocaleString()}`, label: 'Total Value' },
         ],
         driver: [
             { icon: '🚚', cls: 'indigo', value: total, label: 'Assigned' },
             { icon: '📍', cls: 'amber', value: inTransit, label: 'In Transit' },
-            { icon: '✅', cls: 'emerald', value: settled, label: 'Delivered' },
+            { icon: '✅', cls: 'emerald', value: completed, label: 'Completed' },
             { icon: '📸', cls: 'cyan', value: proofPending, label: 'Proof Pending' },
         ],
         admin: [
             { icon: '📊', cls: 'indigo', value: total, label: 'Total Orders' },
             { icon: '⚠️', cls: 'rose', value: disputed, label: 'Disputes' },
-            { icon: '✅', cls: 'emerald', value: settled + resolved, label: 'Resolved' },
+            { icon: '✅', cls: 'emerald', value: completed, label: 'Resolved/Settled' },
             { icon: '💰', cls: 'cyan', value: `₹${totalValue.toLocaleString()}`, label: 'Total Value' },
         ],
         supplier: [
             { icon: '📦', cls: 'indigo', value: total, label: 'Orders' },
             { icon: '⏳', cls: 'amber', value: active, label: 'Pending' },
-            { icon: '✅', cls: 'emerald', value: settled, label: 'Settled' },
+            { icon: '✅', cls: 'emerald', value: completed, label: 'Completed' },
             { icon: '💰', cls: 'cyan', value: `₹${totalValue.toLocaleString()}`, label: 'Earnings' },
         ],
     };
@@ -65,6 +65,14 @@ export default function Dashboard({ onOrderAction }) {
     function handleAction(action, orderId) {
         if (onOrderAction) onOrderAction(action, orderId, loadData);
     }
+    
+    // Prioritize active orders first, then sort by newest
+    const displayOrders = [...orders].sort((a, b) => {
+        const aActive = !['SETTLED', 'RESOLVED', 'DELETED'].includes(a.status);
+        const bActive = !['SETTLED', 'RESOLVED', 'DELETED'].includes(b.status);
+        if (aActive !== bActive) return aActive ? -1 : 1;
+        return new Date(b.createdAt) - new Date(a.createdAt);
+    }).slice(0, 6);
 
     return (
         <div className="fade-in">
@@ -95,7 +103,7 @@ export default function Dashboard({ onOrderAction }) {
                     </div>
                 ) : (
                     <div className="orders-grid">
-                        {orders.slice(0, 6).map(order => (
+                        {displayOrders.map(order => (
                             <OrderCard key={order.orderId} order={order} onAction={handleAction} />
                         ))}
                     </div>

@@ -22,12 +22,54 @@ const ledger = new Ledger();
 const chaincode = new EscrowChaincode(ledger, hardhat);
 
 // Initialize database
-initDatabase().then(success => {
-  if (success) console.log('✅ Database initialization complete');
+initDatabase().then(async success => {
+  if (success) {
+    console.log('✅ Database initialization complete');
+    await rehydrateWorldState();
+  }
 }).catch(err => {
   console.error('❌ Fatal Database Error:', err);
   process.exit(1);
 });
+
+async function rehydrateWorldState() {
+  try {
+    const res = await db.query('SELECT * FROM orders_metadata ORDER BY created_at ASC');
+    let rehydratedCount = 0;
+    
+    for (const row of res.rows) {
+      const orderId = row.order_id;
+      // Skip if somehow already in worldState
+      if (chaincode.worldState.has(orderId)) continue;
+      
+      const order = {
+        orderId: row.order_id,
+        customerId: row.customer_id,
+        supplierId: row.supplier_id,
+        driverId: row.driver_id,
+        amount: parseFloat(row.amount),
+        description: row.description,
+        pickup: row.pickup_address,
+        delivery: row.delivery_address,
+        status: row.status,
+        paymentRef: null,
+        deliveryProof: null, // Note: proof hashes/resolutions aren't fully reconstructed here in this version, but status is
+        disputeReason: null,
+        resolution: null,
+        onChainTxHash: row.on_chain_tx_hash,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      };
+      
+      chaincode.worldState.set(orderId, order);
+      rehydratedCount++;
+    }
+    
+    console.log(`✅ Rehydrated ${rehydratedCount} orders from database into chaincode worldState`);
+  } catch (err) {
+    console.warn(`⚠️ Warning: Failed to rehydrate world state: ${err.message}`);
+  }
+}
 
 // Import route modules
 const authRoutes = require('./routes/auth')(db);
