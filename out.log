@@ -1,0 +1,6 @@
+Connected to Hardhat RPC at http://127.0.0.1:8545
+🔗 Connected to Neon Serverless PostgreSQL
+🚀 Server running on port 3001
+📱 API ready for Flutter consumption at /api/v1
+✅ Database initialization complete
+✅ Rehydrated 20 orders from database into chaincode worldState
