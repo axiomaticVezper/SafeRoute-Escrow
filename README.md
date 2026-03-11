@@ -2,7 +2,7 @@
 
 SafeRoute Escrow is a decentralized escrow payment system designed for the future of logistics. Combining Hardhat blockchain security with Stripe payment processing, it ensures funds are only released when delivery is cryptographically verified. Built with React, Node.js, and Neon PostgreSQL.
 
-![Escrow Flow](media__1773050833091.png)
+![Escrow Flow](EscrowFlow.png)
 
 ## �️ Architecture
 This project uses a three-tier architecture to ensure absolute transparency and security:
