@@ -2,7 +2,7 @@
 
 EscrowChain is a robust smart contract-based payment system for transportation and logistics. It ensures that funds are held securely until delivery conditions are met, protecting both customers and suppliers.
 
-![Escrow Flow]
+#Escrow Flow
 
 ## 🆕 Tech Stack Update
 This project has been extensively modernized:
